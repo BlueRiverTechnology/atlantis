@@ -699,6 +699,7 @@ func NewServer(userConfig UserConfig, config Config) (*Server, error) {
 		VcsClient:        vcsClient,
 		Locker:           projectLocker,
 		LockURLGenerator: router,
+		JobURLGenerator:  router,
 		Logger:           logger,
 		InitStepRunner: &runtime.InitStepRunner{
 			TerraformExecutor:     terraformClient,
@@ -1110,7 +1111,15 @@ func (s *Server) Start() error {
 
 	tlsConfig := &tls.Config{GetCertificate: s.GetSSLCertificate, MinVersion: tls.VersionTLS12}
 
-	server := &http.Server{Addr: fmt.Sprintf(":%d", s.Port), Handler: n, TLSConfig: tlsConfig, ReadHeaderTimeout: 10 * time.Second}
+	server := &http.Server{
+		Addr:              fmt.Sprintf(":%d", s.Port),
+		Handler:           n,
+		TLSConfig:         tlsConfig,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       20 * time.Minute, // Allow 20 minutes for request body (long-running terraform plans)
+		WriteTimeout:      20 * time.Minute, // Allow 20 minutes to write response
+		IdleTimeout:       20 * time.Minute, // Keep idle connections for 20 minutes
+	}
 	go func() {
 		s.Logger.Info("Atlantis started - listening on port %v", s.Port)
 

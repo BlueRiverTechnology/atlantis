@@ -15,6 +15,8 @@ type ProjectResult struct {
 	PlanSuccess        *models.PlanSuccess
 	PolicyCheckResults *models.PolicyCheckResults
 	ApplySuccess       string
+	ApplySummary       string
+	ProjectJobURL      string // URL to view live job output (e.g., /jobs/<job-id>)
 	VersionSuccess     string
 	ImportSuccess      *models.ImportSuccess
 	StateRmSuccess     *models.StateRmSuccess

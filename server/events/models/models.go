@@ -390,6 +390,8 @@ type PlanSuccess struct {
 	// branch we're merging into had been updated, and we had to merge again
 	// before planning
 	MergedAgain bool
+	// PlanSummary is a human-readable summary of resource changes (if show step was run)
+	PlanSummary string
 }
 
 type PolicySetResult struct {
