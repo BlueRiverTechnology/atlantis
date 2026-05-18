@@ -27,7 +27,7 @@ Execute [atlantis plan](using-atlantis.md#atlantis-plan) on the specified reposi
 | Ref        | string  | Yes      | Git reference, like a branch name        |
 | Type       | string  | Yes      | Type of the VCS provider (Github/Gitlab) |
 | Paths      | Path    | Yes      | Paths to the projects to run the plan    |
-| PR         | int     | No       | Pull Request number                      |
+| PR         | int     | No       | Pull Request number. Set to `0` or omit to run plan directly on a branch without a PR (branch mode) |
 
 #### Path
 
@@ -42,6 +42,7 @@ At least one of `Directory` or `Workspace` should be specified.
 
 #### Sample Request
 
+**With Pull Request:**
 ```shell
 curl --request POST 'https://<ATLANTIS_HOST_NAME>/api/plan' \
 --header 'X-Atlantis-Token: <ATLANTIS_API_SECRET>' \
@@ -57,6 +58,29 @@ curl --request POST 'https://<ATLANTIS_HOST_NAME>/api/plan' \
     "PR": 2
 }'
 ```
+
+**Branch Mode (without PR):**
+```shell
+curl --request POST 'https://<ATLANTIS_HOST_NAME>/api/plan' \
+--header 'X-Atlantis-Token: <ATLANTIS_API_SECRET>' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "Repository": "repo-name",
+    "Ref": "main",
+    "Type": "Github",
+    "Paths": [{
+      "Directory": ".",
+      "Workspace": "default"
+    }]
+}'
+```
+
+:::warning Branch Mode (PR=0)
+- No VCS commit status updates
+- Concurrent branch plans share locks → conflicts possible
+- `Ref` must be branch name (no SHA support)
+- MVP feature - experimental
+:::
 
 #### Sample Response
 
@@ -102,7 +126,7 @@ Execute [atlantis apply](using-atlantis.md#atlantis-apply) on the specified repo
 | Ref        | string | Yes      | Git reference, like a branch name        |
 | Type       | string | Yes      | Type of the VCS provider (Github/Gitlab) |
 | Paths      | Path   | Yes      | Paths to the projects to run the apply   |
-| PR         | int    | No       | Pull Request number                      |
+| PR         | int    | No       | Pull Request number. Set to `0` or omit to run apply directly on a branch without a PR (branch mode) |
 
 #### Path
 
